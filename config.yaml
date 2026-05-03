@@ -1,0 +1,46 @@
+general:
+  output_dir: "./output"
+  log_dir: "./logs"
+  cache_dir: "./cache"
+  log_level: "INFO"
+
+trends:
+  feeds:
+    - "https://trends.google.com/trends/trendingsearches/daily/rss?geo=US"
+  geo: "US"
+  window_hours: 24
+  max_trends: 50
+
+rss:
+  feeds:
+    - "http://feeds.bbci.co.uk/news/rss.xml"
+    - "http://rss.cnn.com/rss/edition.rss"
+  timeout_seconds: 30
+  max_articles_per_feed: 100
+  user_agent: "TrendingNewsWorker/1.0"
+
+scoring:
+  trend_match_weight: 0.6
+  recency_weight: 0.2
+  source_authority_weight: 0.2
+  fuzzy_threshold: 85
+
+output:
+  formats:
+    - "json"
+    - "markdown"
+  max_ranked_articles: 20
+  include_scores: true
+  include_trend_matches: true
+
+cache:
+  backend: "sqlite"
+  enabled: true
+  ttl_seconds: 3600
+  sqlite_path: "./cache/trending_news.db"
+  redis_enabled: false
+
+deduplication:
+  enabled: true
+  method: "fuzzy"
+  threshold: 85
