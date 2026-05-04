@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Any
 
 import feedparser
@@ -17,6 +17,7 @@ from src.exceptions import FeedError
 # Default authority scores for known news sources
 SOURCE_AUTHORITY: dict[str, float] = {
     "bbc.co.uk": 0.9,
+    "bbci.co.uk": 0.9,
     "bbc.com": 0.9,
     "cnn.com": 0.85,
     "reuters.com": 0.95,
@@ -64,7 +65,8 @@ def _get_authority_score(url: str) -> float:
     """
     domain = _extract_domain(url)
     for known_domain, score in SOURCE_AUTHORITY.items():
-        if known_domain in domain:
+        # Match if domain is exactly the known domain, or is a subdomain of it
+        if domain == known_domain or domain.endswith("." + known_domain):
             return score
     return 0.5  # Default authority for unknown sources
 
@@ -91,6 +93,8 @@ def _parse_article_entry(
         summary = str(summary).strip()
 
     published = getattr(entry, "published", "") or getattr(entry, "updated", "")
+    if not isinstance(published, str):
+        published = str(published) if published else ""
 
     # Parse the timestamp
     timestamp = ""
@@ -102,7 +106,7 @@ def _parse_article_entry(
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=timezone.utc)
             timestamp = dt.isoformat()
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, OverflowError):
             timestamp = published
 
     # Determine source name

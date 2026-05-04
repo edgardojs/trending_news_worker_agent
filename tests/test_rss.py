@@ -37,7 +37,7 @@ def test_get_authority_score():
 
 def test_parse_article_entry():
     """Test parsing an RSS entry into normalized article."""
-    entry = MagicMock()
+    entry = MagicMock(spec=[])
     entry.title = "Breaking News Story"
     entry.link = "https://www.bbc.co.uk/news/story-123"
     entry.summary = "A brief description of the story."
@@ -53,7 +53,7 @@ def test_parse_article_entry():
 
 def test_parse_article_entry_empty_title():
     """Test that entries with empty titles are handled."""
-    entry = MagicMock()
+    entry = MagicMock(spec=[])
     entry.title = ""
     entry.link = "https://example.com/article"
     entry.summary = ""
@@ -65,16 +65,19 @@ def test_parse_article_entry_empty_title():
 
 def test_fetch_rss_feeds_with_entries(mock_config):
     """Test fetching RSS feeds with valid entries."""
-    entry = MagicMock()
+    entry = MagicMock(spec=[])
     entry.title = "Test Article"
     entry.link = "https://www.bbc.co.uk/news/test"
     entry.summary = "Test summary"
     entry.published = "Fri, 02 May 2026 08:00:00 GMT"
 
+    mock_feed = MagicMock()
+    mock_feed.title = "BBC News"
+
     mock_feed_data = MagicMock()
     mock_feed_data.entries = [entry]
     mock_feed_data.bozo = 0
-    mock_feed_data.feed.title = "BBC News"
+    mock_feed_data.feed = mock_feed
 
     with patch("src.rss.feedparser.parse", return_value=mock_feed_data), \
          patch("src.rss._fetch_feed_content", return_value="<rss></rss>"):

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Any
 
 import feedparser
@@ -33,6 +33,8 @@ def _parse_trend_entry(entry: Any, geo: str) -> dict[str, Any]:
     title = getattr(entry, "title", "").strip()
     link = getattr(entry, "link", "").strip()
     published = getattr(entry, "published", "") or getattr(entry, "updated", "")
+    if not isinstance(published, str):
+        published = str(published) if published else ""
 
     # Parse the timestamp
     timestamp = ""
@@ -44,7 +46,7 @@ def _parse_trend_entry(entry: Any, geo: str) -> dict[str, Any]:
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=timezone.utc)
             timestamp = dt.isoformat()
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, OverflowError):
             timestamp = published
 
     # Extract approximate search volume from ht:approx_traffic if available

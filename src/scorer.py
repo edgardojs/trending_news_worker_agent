@@ -45,7 +45,7 @@ def compute_recency_score(published: str, reference_time: str | None = None) -> 
 
         return max(0.0, min(100.0, recency_score))
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         return 0.0
 
 

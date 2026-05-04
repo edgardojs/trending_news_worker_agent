@@ -47,13 +47,22 @@ def _build_json_report(
     # Build ranked articles output
     ranked_output: list[dict[str, Any]] = []
     for article in ranked_articles:
+        # Safely extract source name — source may be a dict, str, or missing
+        raw_source = article.get("source", {})
+        if isinstance(raw_source, dict):
+            source_name = raw_source.get("name", "")
+        elif isinstance(raw_source, str):
+            source_name = raw_source
+        else:
+            source_name = ""
+
         entry: dict[str, Any] = {
             "rank": article.get("rank", 0),
             "title": article.get("title", ""),
             "link": article.get("link", ""),
-            "source": article.get("source", {}).get("name", ""),
+            "source": source_name,
             "published": article.get("published", ""),
-            "trend_score": article.get("final_score", 0),
+            "trend_score": article.get("final_score") or 0,
         }
 
         if config.output.include_trend_matches:
@@ -61,10 +70,10 @@ def _build_json_report(
 
         if config.output.include_scores:
             entry["scores"] = {
-                "trend_match": article.get("trend_match_score", 0),
-                "recency": article.get("recency_score", 0),
-                "authority": article.get("authority_score", 0),
-                "final": article.get("final_score", 0),
+                "trend_match": article.get("trend_match_score") or 0,
+                "recency": article.get("recency_score") or 0,
+                "authority": article.get("authority_score") or 0,
+                "final": article.get("final_score") or 0,
             }
 
         ranked_output.append(entry)
@@ -125,7 +134,7 @@ def write_json_report(
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
         return filepath
-    except OSError as e:
+    except (OSError, TypeError, ValueError) as e:
         raise OutputError(f"Failed to write JSON report: {e}") from e
 
 
@@ -195,7 +204,7 @@ def write_markdown_report(
             link = article.get("link", "")
             source = article.get("source", "Unknown")
             published = article.get("published", "")
-            score = article.get("trend_score", 0)
+            score = article.get("trend_score") or 0
 
             lines.append(f"### {rank}. {title}")
             lines.append("")
@@ -214,11 +223,14 @@ def write_markdown_report(
             # Show score breakdown
             scores = article.get("scores", {})
             if scores:
+                trend_match = scores.get("trend_match") or 0
+                recency = scores.get("recency") or 0
+                authority = scores.get("authority") or 0
                 lines.append("- **Score Breakdown:**")
                 lines.append(
-                    f"  - Trend Match: {scores.get('trend_match', 0):.1f} | "
-                    f"Recency: {scores.get('recency', 0):.1f} | "
-                    f"Authority: {scores.get('authority', 0):.1f}"
+                    f"  - Trend Match: {trend_match:.1f} | "
+                    f"Recency: {recency:.1f} | "
+                    f"Authority: {authority:.1f}"
                 )
 
             lines.append("")
@@ -239,7 +251,7 @@ def write_markdown_report(
 
         return filepath
 
-    except OSError as e:
+    except (OSError, TypeError, ValueError) as e:
         raise OutputError(f"Failed to write Markdown report: {e}") from e
 
 

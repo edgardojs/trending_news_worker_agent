@@ -83,5 +83,5 @@ def _parse_timestamp_for_sort(timestamp: str) -> float:
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
         return dt.timestamp()
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         return 0.0

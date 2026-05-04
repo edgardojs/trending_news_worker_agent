@@ -23,10 +23,9 @@ import json
 import sys
 import time
 from datetime import datetime, timezone
-from pathlib import Path
 
 from src.cache_sqlite import CacheDB
-from src.config import AppConfig, ensure_directories, load_config
+from src.config import ensure_directories, load_config
 from src.deduplicate import deduplicate_articles
 from src.exceptions import CacheError, ConfigError, OutputError
 from src.logging_setup import get_component_logger, setup_logging
@@ -163,7 +162,7 @@ def run_worker(config_path: str) -> int:
 
         # --- Generate Reports ---
         log.info("Generating output reports")
-        json_path, md_path = generate_reports(
+        generate_reports(
             config=config,
             trends=trends,
             articles_matched=matched,

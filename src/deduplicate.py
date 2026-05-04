@@ -27,7 +27,7 @@ def compute_similarity(title_a: str, title_b: str) -> int:
     if not norm_a or not norm_b:
         return 0
 
-    return fuzz.token_set_ratio(norm_a, norm_b)
+    return int(fuzz.token_set_ratio(norm_a, norm_b))
 
 
 def deduplicate_articles(
@@ -57,7 +57,6 @@ def deduplicate_articles(
     )
 
     kept: list[dict[str, Any]] = []
-    duplicate_groups: list[list[str]] = []  # Track groups of duplicate IDs
 
     for article in sorted_articles:
         is_duplicate = False

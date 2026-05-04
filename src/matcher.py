@@ -34,7 +34,7 @@ def compute_match_score(article_title: str, trend_title: str) -> int:
     partial_ratio = fuzz.partial_ratio(norm_article, norm_trend)
     token_set_ratio = fuzz.token_set_ratio(norm_article, norm_trend)
 
-    return max(ratio, partial_ratio, token_set_ratio)
+    return int(max(ratio, partial_ratio, token_set_ratio))
 
 
 def match_articles_to_trends(
@@ -73,8 +73,7 @@ def match_articles_to_trends(
                         "match_score": score,
                     }
                 )
-                if score > best_score:
-                    best_score = score
+                best_score = max(best_score, score)
 
         # Only include articles that have at least one trend match
         if matched_trends:

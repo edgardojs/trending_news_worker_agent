@@ -24,7 +24,7 @@ def mock_config():
 
 def test_parse_trend_entry():
     """Test parsing a Google Trends RSS entry."""
-    entry = MagicMock()
+    entry = MagicMock(spec=[])
     entry.title = "Climate Summit"
     entry.link = "https://trends.google.com/foo"
     entry.published = "Fri, 02 May 2026 10:00:00 GMT"
@@ -39,7 +39,7 @@ def test_parse_trend_entry():
 
 def test_parse_trend_entry_no_traffic():
     """Test parsing an entry without traffic data."""
-    entry = MagicMock()
+    entry = MagicMock(spec=[])
     entry.title = "Test Trend"
     entry.link = "https://example.com"
     entry.published = ""
@@ -52,7 +52,7 @@ def test_parse_trend_entry_no_traffic():
 
 def test_fetch_trends_empty_feed(mock_config):
     """Test fetching trends when feed returns no entries."""
-    mock_feed_data = MagicMock()
+    mock_feed_data = MagicMock(spec=[])
     mock_feed_data.entries = []
     mock_feed_data.bozo = 0
 
@@ -64,13 +64,13 @@ def test_fetch_trends_empty_feed(mock_config):
 
 def test_fetch_trends_with_entries(mock_config):
     """Test fetching trends with valid entries."""
-    entry = MagicMock()
+    entry = MagicMock(spec=[])
     entry.title = "Test Trend"
     entry.link = "https://trends.google.com/test"
     entry.published = "Fri, 02 May 2026 10:00:00 GMT"
     entry.ht_approx_traffic = "100K+"
 
-    mock_feed_data = MagicMock()
+    mock_feed_data = MagicMock(spec=[])
     mock_feed_data.entries = [entry]
     mock_feed_data.bozo = 0
 
